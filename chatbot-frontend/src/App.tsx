@@ -10,12 +10,14 @@ import LoginPage from "./pages/loginPage"
 import RegisterPage from "./pages/registerPage"
 import ChatPage from "./pages/chatPage"
 import FileManagerPage from "./pages/fileManagerPage"
+import Dashboard from "./pages/dashboardPage.tsx"
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/chat" element={<ChatPage />} />
