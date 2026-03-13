@@ -1,0 +1,38 @@
+{
+  "name": "chatbot",
+  "version": "1.0.0",
+  "description": "Este repositório contém o desenvolvimento de um chatbot como atividade prática da disciplina de LES (Laboratório de Engenharia de Software). O projeto tem como objetivo aplicar conceitos de engenharia de software no planejamento, desenvolvimento e evolução de um sistema conversacional. teste123",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HenriqueFrisso/chatbot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HenriqueFrisso/chatbot/issues"
+  },
+  "homepage": "https://github.com/HenriqueFrisso/chatbot#readme",
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "concurrently": "^9.2.1",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"docker compose up\" \"npm run dev-backend\" \"npm run dev-frontend\"",
+    "dev-backend": "cd backend && npx nodemon server.js",
+    "dev-frontend": "cd frontend && npm run dev"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "JSX": "^1.1.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-toastify": "^11.0.5",
+    "sonner": "^2.0.7"
+  }
+}
