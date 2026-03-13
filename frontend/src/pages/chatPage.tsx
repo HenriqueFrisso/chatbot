@@ -1,6 +1,26 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
 
 export default function ChatPage() {
+  const navigate = useNavigate()
+  const [usuario, setUsuario] = useState<{ nome: string } | null>(null)
+
+  // Carrega usuário do localStorage ao montar o componente
+  useEffect(() => {
+    const usuarioLogado = localStorage.getItem("usuario")
+    if (usuarioLogado) {
+      setUsuario(JSON.parse(usuarioLogado))
+    } else {
+      // Se não tiver usuário, redireciona para login
+      navigate("/login")
+    }
+  }, [])
+
+  function handleLogout() {
+    localStorage.removeItem("usuario")
+    navigate("/login")
+  }
+
   return (
     <div className="h-screen flex
       bg-white text-black
@@ -12,6 +32,10 @@ export default function ChatPage() {
         dark:bg-neutral-900 dark:border-neutral-800">
 
         <div className="p-4 border-b border-neutral-300 dark:border-neutral-800 space-y-2">
+          <div className="font-semibold">
+            Olá, {usuario?.nome || "Usuário"}
+          </div>
+
           <button className="w-full bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 p-2 rounded-lg transition">
             + Nova conversa
           </button>
@@ -34,12 +58,12 @@ export default function ChatPage() {
         </div>
 
         <div className="p-4 border-t border-neutral-300 dark:border-neutral-800">
-          <Link
-            to="/login"
+          <button
+            onClick={handleLogout}
             className="text-sm text-red-500 hover:underline"
           >
             Sair
-          </Link>
+          </button>
         </div>
       </aside>
 

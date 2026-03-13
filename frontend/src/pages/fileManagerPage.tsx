@@ -1,6 +1,19 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
 
 export default function FileManagerPage() {
+  const navigate = useNavigate()
+  const [usuario, setUsuario] = useState<{ nome: string } | null>(null)
+
+  // Checa login
+  useEffect(() => {
+    const usuarioLogado = localStorage.getItem("usuario")
+    if (usuarioLogado) {
+      setUsuario(JSON.parse(usuarioLogado))
+    } else {
+      navigate("/login")
+    }
+  }, [])
 
   function toggleTheme() {
     document.documentElement.classList.toggle("dark")
@@ -8,6 +21,11 @@ export default function FileManagerPage() {
 
   function handleAddFile() {
     console.log("Adicionar novo arquivo")
+  }
+
+  function handleLogout() {
+    localStorage.removeItem("usuario")
+    navigate("/login")
   }
 
   const arquivos = [
@@ -24,6 +42,7 @@ export default function FileManagerPage() {
       bg-white text-black
       dark:bg-neutral-950 dark:text-white">
 
+      {/* HEADER */}
       <div className="flex justify-between items-center mb-8">
 
         <div className="flex gap-4 items-center">
@@ -39,7 +58,8 @@ export default function FileManagerPage() {
           </h1>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 items-center">
+          {usuario && <span className="font-medium">Olá, {usuario.nome}</span>}
 
           <Link
             to="/dashboard"
@@ -55,17 +75,15 @@ export default function FileManagerPage() {
             🌗
           </button>
 
-          <Link
-            to="/login"
-            className="px-4 py-2 rounded-lg bg-red-600 text-white"
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-500 transition"
           >
             Logout
-          </Link>
-
+          </button>
         </div>
 
       </div>
-
 
       {/* Botão adicionar arquivo */}
       <div className="flex justify-end mb-4">
@@ -76,7 +94,6 @@ export default function FileManagerPage() {
           + Adicionar Arquivo
         </button>
       </div>
-
 
       {/* Lista de arquivos */}
       <div className="rounded-xl border
@@ -89,12 +106,8 @@ export default function FileManagerPage() {
             className="flex justify-between items-center p-4
             hover:bg-neutral-200 dark:hover:bg-neutral-800 transition"
           >
-
             <div className="flex flex-col">
-              <span className="font-medium">
-                {file.nome}
-              </span>
-
+              <span className="font-medium">{file.nome}</span>
               <span className="text-xs text-neutral-500">
                 Última modificação: {file.atualizado}
               </span>
@@ -104,7 +117,6 @@ export default function FileManagerPage() {
               bg-neutral-300 dark:bg-neutral-700 text-sm">
               Editar
             </button>
-
           </div>
         ))}
 
