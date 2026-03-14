@@ -1,7 +1,15 @@
 import * as documentoRepository from "../repositories/documentoRepository.js";
 
+// Lista de extensões permitidas
+const EXTENSOES_PERMITIDAS = ["cpp", "h", "js", "ts", "py", "java", "txt", "in", "sh"];
+
 export async function cadastrarDocumento(documento) {
   const { titulo, linguagem, idusuario } = documento;
+
+  // Valida extensão
+  if (!EXTENSOES_PERMITIDAS.includes(linguagem.toLowerCase())) {
+    throw new Error(`Extensão .${linguagem} não permitida. Apenas: ${EXTENSOES_PERMITIDAS.join(", ")}`);
+  }
 
   // Verifica se já existe documento com mesmo título e linguagem
   const documentosExistentes = await documentoRepository.listarDocumentosPorUsuario(idusuario);
@@ -24,6 +32,13 @@ export async function listarDocumentos(idusuario) {
 }
 
 export async function atualizarDocumento(iddocumento, dados) {
+  const { linguagem } = dados;
+
+  // Valida extensão ao atualizar
+  if (linguagem && !EXTENSOES_PERMITIDAS.includes(linguagem.toLowerCase())) {
+    throw new Error(`Extensão .${linguagem} não permitida. Apenas: ${EXTENSOES_PERMITIDAS.join(", ")}`);
+  }
+
   const linhasAfetadas = await documentoRepository.atualizarDocumento(iddocumento, dados);
   if (linhasAfetadas === 0) throw new Error("Documento não encontrado");
   return true;

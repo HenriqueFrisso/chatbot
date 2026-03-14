@@ -28,6 +28,9 @@ export default function FileManagerPage() {
   const [editingDocId, setEditingDocId] = useState<number | null>(null)
   const [docMessage, setDocMessage] = useState<string | null>(null)
 
+  // Novo estado: modo de upload (arquivo ou pasta)
+  const [uploadMode, setUploadMode] = useState<"file" | "folder">("file")
+
   // Checa login
   useEffect(() => {
     const usuarioLogado = localStorage.getItem("usuario")
@@ -74,31 +77,47 @@ export default function FileManagerPage() {
     setShowModalDoc(true)
   }
 
-function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-  const file = e.target.files?.[0]
-  if (!file) return
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-  // Preenche título e linguagem automaticamente
-  setDocTitulo(file.name.replace(/\.[^/.]+$/, ""))
-  setDocLinguagem(file.name.split(".").pop() || "")
+    setDocTitulo(file.name.replace(/\.[^/.]+$/, ""))
+    setDocLinguagem(file.name.split(".").pop() || "")
 
-  const reader = new FileReader()
-  reader.onload = (event) => {
-    // optional chaining para evitar null e type cast para string
-    const text = event.target?.result
-    if (typeof text === "string") {
-      setDocConteudo(text)
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const text = event.target?.result
+      if (typeof text === "string") {
+        setDocConteudo(text)
+      }
     }
+    reader.readAsText(file)
   }
-  reader.readAsText(file)
-}
+
+  function handleFolderUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (!files || !usuario) return
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const content = event.target?.result
+        if (typeof content === "string") {
+          cadastrarDocumento({
+            titulo: file.name.replace(/\.[^/.]+$/, ""),
+            linguagem: file.name.split(".").pop() || "",
+            conteudo: content,
+            idusuario: usuario.id,
+          }).then(() => carregarDocumentos(usuario.id))
+            .catch(err => console.error(err))
+        }
+      }
+      reader.readAsText(file)
+    })
+  }
 
   async function salvarDocumento() {
     if (!usuario) return
-    if (!docTitulo || !docLinguagem || !docConteudo) {
-      setDocMessage("Preencha todos os campos")
-      return
-    }
 
     try {
       if (editingDocId) {
@@ -157,7 +176,7 @@ function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
       </div>
 
       {/* Lista de documentos */}
-      <div className="rounded-xl border bg-neutral-100 border-neutral-300 dark:bg-neutral-900 dark:border-neutral-800 divide-y dark:divide-neutral-800">
+      <div className=" overflow-y-auto max-h-[680px] rounded-xl border bg-neutral-100 border-neutral-300 dark:bg-neutral-900 dark:border-neutral-800 divide-y dark:divide-neutral-800">
         {documentos.map((doc) => (
           <div key={doc.iddocumento} className="flex justify-between items-center p-4 hover:bg-neutral-200 dark:hover:bg-neutral-800 transition">
             <div className="flex flex-col">
@@ -217,13 +236,48 @@ function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
             )}
 
             <div className="space-y-4">
+              {/* Radio Buttons para alternar upload */}
+              <div className="flex gap-4 items-center">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="uploadMode"
+                    value="file"
+                    checked={uploadMode === "file"}
+                    onChange={() => setUploadMode("file")}
+                  />
+                  Arquivo
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="uploadMode"
+                    value="folder"
+                    checked={uploadMode === "folder"}
+                    onChange={() => setUploadMode("folder")}
+                  />
+                  Pasta
+                </label>
+              </div>
+
               {/* Input de upload */}
-              <input
-                type="file"
-                accept=".cpp,.h,.js,.ts,.py,.java,.txt"
-                onChange={handleFileUpload}
-                className="w-full p-3 rounded-lg bg-neutral-200 dark:bg-neutral-800 outline-none"
-              />
+              {uploadMode === "file" ? (
+                <input
+                  type="file"
+                  accept=".cpp,.h,.js,.ts,.py,.java,.txt,.in,.sh"
+                  onChange={handleFileUpload}
+                  className="w-full p-3 rounded-lg bg-neutral-200 dark:bg-neutral-800 outline-none"
+                />
+              ) : (
+                <input
+                  type="file"
+                  multiple
+                  accept=".cpp,.h,.js,.ts,.py,.java,.txt,.in,.sh"
+                  onChange={handleFolderUpload}
+                  className="w-full p-3 rounded-lg bg-neutral-200 dark:bg-neutral-800 outline-none"
+                  {...({ webkitdirectory: "true" } as any)}
+                />
+              )}
 
               {/* Campos preenchidos automaticamente e imutáveis */}
               <input
