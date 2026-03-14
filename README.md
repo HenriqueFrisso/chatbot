@@ -65,8 +65,8 @@ Senha: `chatbot`
 │   ├── assets/               # Recursos estáticos como imagens e estilos
 │   ├── pages/                # Páginas e telas da aplicação
 │   └── services/             # Comunicação com o backend e consumo de APIs
-├── database/                 # Scripts e configuração do banco de dados
-│   └── init.sql              # Scripts de criação e populamento inicial
+├── database/                 # Scripts e diagramas do banco de dados
+│   └── init.sql              # Script de criação do banco de dados
 ├── package.json              # Configuração e dependências do Node.js
 └── README.md                 # Documentação do projeto
 ```
